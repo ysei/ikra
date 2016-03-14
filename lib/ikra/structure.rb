@@ -1,10 +1,10 @@
 require "ikra/c_boolean"
 
 module Ikra
-  Fix        = Struct.new(:x, :y, :z)
-  Volume     = Struct.new(:x, :y, :z)
-  Periodic   = Struct.new(:x, :y, :z)
-  Coordinate = Struct.new(:x, :y, :z)
+  Fix        = Struct.new("Fix", :x, :y, :z)
+  Volume     = Struct.new("Volume", :x, :y, :z)
+  Periodic   = Struct.new("Periodic", :x, :y, :z)
+  Coordinate = Struct.new("Coordinate", :x, :y, :z)
 
   def summation num
     num == 0 ? 0 : num + summation(num - 1)
@@ -19,7 +19,7 @@ module Ikra
       @atoms         = []
       fp.each do |line|
         words           = line.split
-        atom            = Struct.new(:type, :coordinate, :fix, :visible).new
+        atom            = Struct.new("Atom", :type, :coordinate, :fix, :visible).new
         atom.type       = words[0]
         atom.coordinate = Coordinate.new(words[1].to_f, words[2].to_f, words[3].to_f)
         atom.fix        = Fix.new(words[4].to_i, words[5].to_i, words[6].to_i)
@@ -66,7 +66,7 @@ module Ikra
       @atoms       = []
       @size.times do
         words           = fp.gets.split
-        atom            = Struct.new(:type, :coordinate, :energy).new
+        atom            = Struct.new("Atom", :type, :coordinate, :energy).new
         atom.type       = words[0]
         atom.coordinate = Coordinate.new(words[1].to_f, words[2].to_f, words[3].to_f)
         atom.energy     = words[4].to_f
