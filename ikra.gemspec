@@ -6,11 +6,10 @@ require 'ikra/version'
 Gem::Specification.new do |spec|
   spec.name          = "ikra"
   spec.version       = Ikra::VERSION
-  spec.authors       = ["Kazuki Takahashi"]
-  spec.email         = ["kazukitash@aoikumo.jp"]
+  spec.authors       = ["kazukitash"]
+  spec.email         = ["kazukitash@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = "Ikra is Molecular Dynamics calculation program."
   spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
