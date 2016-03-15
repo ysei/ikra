@@ -23,9 +23,9 @@ module Ikra
         words           = line.split
         atom            = MDLAtom.new
         atom.type       = words[0]
-        atom.coordinate = Coordinate.new(words[1].to_f, words[2].to_f, words[3].to_f)
-        atom.fix        = Fix.new(words[4].to_i, words[5].to_i, words[6].to_i)
-        atom.visible    = words[7].to_i
+        atom.coordinate = Coordinate.new(Float(words[1]), Float(words[2]), Float(words[3]))
+        atom.fix        = Fix.new(Integer(words[4]), Integer(words[5]), Integer(words[6]))
+        atom.visible    = Integer(words[7])
         @atoms.push atom
       end
     end
@@ -53,25 +53,23 @@ module Ikra
 
   class XYZ
     attr_accessor :temperature, :atoms, :size
-    attr_reader :index_of_frame, :eof
+    attr_reader :index_of_frame
 
     def initialize
       @index_of_frame = -1
-      @eof            = false
     end
 
     # 1 frame
     def read fp
-      @size        = fp.gets.to_i
-      @eof         = true if @size == 0
-      @temperature = fp.gets.to_f
+      @size        = Integer(fp.gets)
+      @temperature = Float(fp.gets)
       @atoms       = []
       @size.times do
         words           = fp.gets.split
         atom            = XYZAtom.new
         atom.type       = words[0]
-        atom.coordinate = Coordinate.new(words[1].to_f, words[2].to_f, words[3].to_f)
-        atom.energy     = words[4].to_f
+        atom.coordinate = Coordinate.new(Float(words[1]), Float(words[2]), Float(words[3]))
+        atom.energy     = Float(words[4])
         @atoms.push atom
       end
       @index_of_frame += 1
@@ -99,32 +97,32 @@ module Ikra
 
     def read fp
       # 全体ループの数
-      @loop_number     = fp.gets.to_i
+      @loop_number     = Integer(fp.gets)
       # 数値急冷法のステップ数
-      @quench_steps    = fp.gets.to_i
+      @quench_steps    = Integer(fp.gets)
       # 焼き鈍しステップ数（NVTアンサンブル）
-      @annealing_steps = fp.gets.to_i
+      @annealing_steps = Integer(fp.gets)
       # NVEアンサンブルステップ数
       nve              = fp.gets.split
-      @dynamics_steps  = nve[0].to_i
-      @output_interval = nve[1].to_i
+      @dynamics_steps  = Integer(nve[0])
+      @output_interval = Integer(nve[1])
       # 共役勾配法ステップ数
-      @cg_steps        = fp.gets.to_i
+      @cg_steps        = Integer(fp.gets)
       # 時間刻みの大きさ（単位：秒）
-      @dt              = fp.gets.to_f
+      @dt              = Float(fp.gets)
       # 設定温度と温度の変化量（焼き鈍しで使う）（単位：K）
       temperatures     = fp.gets.split
-      @temperature     = temperatures[0].to_f
-      @dtemperature    = temperatures[1].to_f
+      @temperature     = Float(temperatures[0])
+      @dtemperature    = Float(temperatures[1])
       # 計算に含まれる原子の種類数
-      elements_num     = fp.gets.to_i
+      elements_num     = Integer(fp.gets)
       @elements        = []
       elements_num.times do
         el             = Element.new
         # 原子のラベル（元素記号）と質量（単位：kg）
         words          = fp.gets.split
         el.atom_type   = words[0].chomp
-        el.mass        = words[1].to_f
+        el.mass        = Float(words[1])
         @elements.push el
       end
       # ポテンシャルタイプの読み込み
@@ -151,56 +149,56 @@ module Ikra
       end
       # 変位境界条件（条件を与えるか、その大きさ、与える領域の厚さ）
       disp_bc          = fp.gets.split
-      @displacement    = disp_bc[0].to_i.to_bool
-      @displacement_u  = disp_bc[1].to_f
-      @displacement_ux = disp_bc[2].to_f
-      @displacement_uz = disp_bc[3].to_f
-      @height          = disp_bc[4].to_f
+      @displacement    = Integer(disp_bc[0]).to_bool
+      @displacement_u  = Float(disp_bc[1])
+      @displacement_ux = Float(disp_bc[2])
+      @displacement_uz = Float(disp_bc[3])
+      @height          = Float(disp_bc[4])
       # 応力境界条件（条件を与えるか、その大きさ）
       shear_bc         = fp.gets.split
-      @shear_stress    = shear_bc[0].to_i.to_bool
-      @stress          = shear_bc[1].to_f
-      @stress_ex       = shear_bc[2].to_f
-      @stress_ez       = shear_bc[3].to_f
+      @shear_stress    = Integer(shear_bc[0]).to_bool
+      @stress          = Float(shear_bc[1])
+      @stress_ex       = Float(shear_bc[2])
+      @stress_ez       = Float(shear_bc[3])
       # SPBC_dx
-      @spbc_dz         = fp.gets.to_f
+      @spbc_dz         = Float(fp.gets)
       # 周期境界条件を与えるか
       periodic_bc      = fp.gets.split
       @periodic        = Periodic.new(
-        periodic_bc[0].to_i.to_bool,
-        periodic_bc[1].to_i.to_bool,
-        periodic_bc[2].to_i.to_bool
+        Integer(periodic_bc[0]).to_bool,
+        Integer(periodic_bc[1]).to_bool,
+        Integer(periodic_bc[2]).to_bool
       )
     end
 
     def read_from_mdl fp
       # 全体ループの数
-      @loop_number     = fp.gets.to_i
+      @loop_number     = Integer(fp.gets)
       # 数値急冷法のステップ数
-      @quench_steps    = fp.gets.to_i
+      @quench_steps    = Integer(fp.gets)
       # 焼き鈍しステップ数（NVTアンサンブル）
-      @annealing_steps = fp.gets.to_i
+      @annealing_steps = Integer(fp.gets)
       # NVEアンサンブルステップ数
       nve = fp.gets.split
-      @dynamics_steps  = nve[0].to_i
-      @output_interval = nve[1].to_i
+      @dynamics_steps  = Integer(nve[0])
+      @output_interval = Integer(nve[1])
       # 共役勾配法ステップ数
-      @cg_steps        = fp.gets.to_i
+      @cg_steps        = Integer(fp.gets)
       # 時間刻みの大きさ（単位：秒）
-      @dt              = fp.gets.to_f
+      @dt              = Float(fp.gets)
       # 設定温度と温度の変化量（焼き鈍しで使う）（単位：K）
       temperatures     = fp.gets.split
-      @temperature     = temperatures[0].to_f
-      @dtemperature    = temperatures[1].to_f
+      @temperature     = Float(temperatures[0])
+      @dtemperature    = Float(temperatures[1])
       # 計算に含まれる原子の種類数
-      elements_num     = fp.gets.to_i
+      elements_num     = Integer(fp.gets)
       @elements        = []
       elements_num.times do
         el             = Element.new
         # 原子のラベル（元素記号）と質量（単位：kg）
         words          = fp.gets.split
         el.atom_type   = words[0].chomp
-        el.mass        = words[1].to_f
+        el.mass        = Float(words[1])
         @elements.push el
       end
       # ポテンシャルタイプの読み込み
@@ -226,35 +224,35 @@ module Ikra
         exit false
       end
       # 原子の数
-      size             = fp.gets.to_i
+      size             = Integer(fp.gets)
       # 計算領域の大きさ
       volumes          = fp.gets.split
       volume           = Volume.new(
-        volumes[0].to_f,
-        volumes[1].to_f,
-        volumes[2].to_f
+        Float(volumes[0]),
+        Float(volumes[1]),
+        Float(volumes[2])
       )
       # 変位境界条件（条件を与えるか、その大きさ、与える領域の厚さ）
       disp_bc          = fp.gets.split
-      @displacement    = disp_bc[0].to_i.to_bool
-      @displacement_u  = disp_bc[1].to_f
-      @displacement_ux = disp_bc[2].to_f
-      @displacement_uz = disp_bc[3].to_f
-      @height          = disp_bc[4].to_f
+      @displacement    = Integer(disp_bc[0]).to_bool
+      @displacement_u  = Float(disp_bc[1])
+      @displacement_ux = Float(disp_bc[2])
+      @displacement_uz = Float(disp_bc[3])
+      @height          = Float(disp_bc[4])
       # 応力境界条件（条件を与えるか、その大きさ）
       shear_bc         = fp.gets.split
-      @shear_stress    = shear_bc[0].to_i.to_bool
-      @stress          = shear_bc[1].to_f
-      @stress_ex       = shear_bc[2].to_f
-      @stress_ez       = shear_bc[3].to_f
+      @shear_stress    = Integer(shear_bc[0]).to_bool
+      @stress          = Float(shear_bc[1])
+      @stress_ex       = Float(shear_bc[2])
+      @stress_ez       = Float(shear_bc[3])
       # SPBC_dx
-      @spbc_dz         = fp.gets.to_f
+      @spbc_dz         = Float(fp.gets)
       # 周期境界条件を与えるか
       periodic_bc      = fp.gets.split
       @periodic        = Periodic.new(
-        periodic_bc[0].to_i.to_bool,
-        periodic_bc[1].to_i.to_bool,
-        periodic_bc[2].to_i.to_bool
+        Integer(periodic_bc[0]).to_bool,
+        Integer(periodic_bc[1]).to_bool,
+        Integer(periodic_bc[2]).to_bool
       )
       return volume, size
     end
