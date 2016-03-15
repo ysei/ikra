@@ -6,12 +6,14 @@ module Ikra
   Periodic   = Struct.new("Periodic", :x, :y, :z)
   Coordinate = Struct.new("Coordinate", :x, :y, :z)
   MDLAtom    = Struct.new("MDLAtom", :type, :coordinate, :fix, :visible)
-  XYZAtom    = Struct.new("XYZAtom", :type, :coordinate, :energy)
+  XYZAtom    = Struct.new("XYZAtom", :type, :coordinate, :energy, :cna, :afterimage)
 
+  private
   def summation num
     num == 0 ? 0 : num + summation(num - 1)
   end
 
+  public
   class MDL
     attr_accessor :condition, :volume, :size, :atoms
 
@@ -70,6 +72,8 @@ module Ikra
         atom.type       = words[0]
         atom.coordinate = Coordinate.new(Float(words[1]), Float(words[2]), Float(words[3]))
         atom.energy     = Float(words[4])
+        atom.cna        = word[6] ? Integer(words[6]) : 0
+        atom.afterimage = word[7] ? Float(words[7]) : 0.0
         @atoms.push atom
       end
       @index_of_frame += 1
@@ -78,7 +82,7 @@ module Ikra
     def write fp
       fp.puts @atoms.size, "%20.15e"%[@temperature]
       @atoms.each_with_index do |atom, index|
-        fp.puts "#{atom.type} % 20.15e % 20.15e % 20.15e % 20.15e #{index}"%[atom.coordinate.x, atom.coordinate.y, atom.coordinate.z, atom.energy]
+        fp.puts "#{atom.type} % 20.15e % 20.15e % 20.15e % 20.15e #{index} #{atom.cna} % 20.15e"%[atom.coordinate.x, atom.coordinate.y, atom.coordinate.z, atom.energy, atom.afterimage]
       end
     end
   end
